@@ -15,13 +15,13 @@ class DeserializationFailed < Exception; end
 
 class Connection < TrivialSoap
   NS_XSI = 'http://www.w3.org/2001/XMLSchema-instance'
-
+  @@loader = nil
   attr_accessor :rev
   attr_reader :profile
   attr_reader :profile_summary
   attr_accessor :profiling
   attr_reader :deserializer
-  
+
   def initialize opts
     @ns = opts[:ns] or fail "no namespace specified"
     @rev = opts[:rev] or fail "no revision specified"
@@ -30,7 +30,7 @@ class Connection < TrivialSoap
     @profiling = false
     super opts
   end
-  
+
   def reset_profiling
     @profile = {}
     @profile_summary = {:network_latency => 0, :request_emit => 0, :response_parse => 0, :num_calls => 0}
@@ -88,7 +88,7 @@ class Connection < TrivialSoap
 
     t3 = Time.now
     out = parse_response resp, desc['result']
-    
+
     if @profiling
       t4 = Time.now
       @profile[method] ||= []
@@ -96,8 +96,8 @@ class Connection < TrivialSoap
         :network_latency => (t3 - t2),
         :request_emit => t2 - t1,
         :response_parse => t4 - t3,
-        :params => params, 
-        :obj => this, 
+        :params => params,
+        :obj => this,
         :backtrace => caller,
         :request_size => body.length,
         :response_size => resp_size,
@@ -108,7 +108,7 @@ class Connection < TrivialSoap
       @profile_summary[:request_emit] += profile_info[:request_emit]
       @profile_summary[:num_calls] += 1
     end
-    
+
     out
   end
 
@@ -200,7 +200,7 @@ class Connection < TrivialSoap
     when :base64Binary then BasicTypes::Binary
     when :KeyValue then BasicTypes::KeyValue
     else
-      if @loader.has? name
+      if @@loader.has? name
         const_get(name)
       else
         fail "no such type #{name.inspect}"
@@ -218,21 +218,24 @@ class Connection < TrivialSoap
 
   def self.add_extension_dir dir
     extension_dirs << dir
-    @loader.reload_extensions_dir dir if @loader
+    @@loader.reload_extensions_dir dir if @@loader
   end
 
   def self.reload_extensions
-    @loader.reload_extensions
+    @@loader.reload_extensions
   end
 
-  def self.loader; @loader; end
+
+  def self.loader; @@loader; end
+
+
 
 protected
 
   def self.const_missing sym
     name = sym.to_s
-    if @loader and @loader.has? name
-      @loader.get(name)
+    if @@loader and @@loader.has? name
+      @@loader.get(name)
     else
       super
     end
@@ -240,15 +243,15 @@ protected
 
   def self.method_missing sym, *a
     name = sym.to_s
-    if @loader and @loader.has? name
-      @loader.get(name).new(*a)
+    if @@loader and @@loader.has? name
+      @@loader.get(name).new(*a)
     else
       super
     end
   end
 
   def self.load_vmodl fn
-    @loader = RbVmomi::TypeLoader.new fn, extension_dirs, self
+    @@loader = RbVmomi::TypeLoader.new fn, extension_dirs, self
     nil
   end
 end
