@@ -1,6 +1,4 @@
 # Copyright (c) 2011 VMware, Inc.  All Rights Reserved.
-require 'rbvmomi'
-
 module RbVmomi
 
 # A connection to one vSphere SDK endpoint.
@@ -45,7 +43,7 @@ class VIM < Connection
     self.cookie = nil
     super
   end
-  
+
   def rev= x
     super
     @serviceContent = nil
