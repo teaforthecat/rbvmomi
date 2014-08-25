@@ -86,7 +86,7 @@ class NewDeserializer
     obj = klass.new nil
     props = obj.props
     children = node.children.select(&:element?)
-    n = children.size
+    # n = children.size
     i = 0
 
     klass.full_props_desc.each do |desc|
@@ -137,7 +137,7 @@ class NewDeserializer
       h[child.name] = child.content
     end
     [h['key'], h['value']]
-  end 
+  end
 end
 
 class OldDeserializer
