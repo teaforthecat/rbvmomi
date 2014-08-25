@@ -1,26 +1,7 @@
+require "bundler/gem_tasks"
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'yard'
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "rbvmomi"
-    gem.summary = "Ruby interface to the VMware vSphere API"
-    #gem.description = ""
-    gem.email = "rlane@vmware.com"
-    gem.homepage = "https://github.com/rlane/rbvmomi"
-    gem.authors = ["Rich Lane"]
-    gem.add_dependency 'nokogiri', '>= 1.4.1'
-    gem.add_dependency 'builder'
-    gem.add_dependency 'trollop'
-    gem.required_ruby_version = '>= 1.8.7'
-    gem.files.include 'vmodl.db'
-    gem.files.include '.yardopts'
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: gem install jeweler"
-end
 
 Rake::TestTask.new do |t|
   t.libs << "test"

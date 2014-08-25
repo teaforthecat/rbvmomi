@@ -1,11 +1,11 @@
-# Copyright (c) 2010 VMware, Inc.  All Rights Reserved.
+require "rbvmomi/version"
 module RbVmomi
 
-# @private
-# @deprecated Use +RbVmomi::VIM.connect+.
-def self.connect opts
-  VIM.connect opts
-end
+  # @private
+  # @deprecated Use +RbVmomi::VIM.connect+.
+  def self.connect opts
+    VIM.connect opts
+  end
 
 end
 require 'rbvmomi/connection'
